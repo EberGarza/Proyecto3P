@@ -2,6 +2,7 @@
 // Archivo base para la implementación inicial del núcleo del juego.
 
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 // Clase principal que controla el flujo del juego
 class Game {
@@ -17,9 +18,29 @@ public:
     }
 
     void MostrarSplashScreen() {
-        // Espacio reservado para la Splash Screen
-        // Aquí se mostrará la pantalla de bienvenida con el logo y recursos de assets
-        // Por implementar: cargar imagen desde assets y mostrarla al usuario
+        // Mostrar la Splash Screen usando SFML
+        sf::RenderWindow window(sf::VideoMode(800, 600), "Cut the Rope - Splash Screen");
+        sf::Texture splashTexture;
+        if (!splashTexture.loadFromFile("assets/images/Splash_Screen.png")) {
+            std::cerr << "No se pudo cargar la imagen de splash screen." << std::endl;
+            return;
+        }
+        sf::Sprite splashSprite(splashTexture);
+        // Centrar la imagen
+        sf::Vector2u size = splashTexture.getSize();
+        splashSprite.setOrigin(size.x / 2, size.y / 2);
+        splashSprite.setPosition(400, 300);
+        while (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed) {
+                    window.close();
+                }
+            }
+            window.clear(sf::Color::Black);
+            window.draw(splashSprite);
+            window.display();
+        }
     }
 
     void BuclePrincipal() {
