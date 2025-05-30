@@ -1,5 +1,5 @@
 // 01_Game.cpp - Estructura base de la clase Game para Cut the Rope (versión capibara)
-// Este archivo servirá como referencia para la implementación inicial del núcleo del juego.
+// Archivo base para la implementación inicial del núcleo del juego.
 
 #include <iostream>
 
@@ -29,4 +29,4 @@ public:
     }
 };
 
-// Puedes usar este archivo como base para expandir la lógica de la clase Game.
+// Archivo base para expandir la lógica de la clase Game.
