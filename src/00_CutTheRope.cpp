@@ -3,10 +3,8 @@
 #include "01_Game.cpp"
 
 int main() {
-    std::cout << "Bienvenido a Cut the Rope (versión capibara)" << std::endl;
     Game game;
     game.MostrarSplashScreen();
-    // game.Inicializar();
-    // game.BuclePrincipal();
+    game.BuclePrincipal();
     return 0;
 }
