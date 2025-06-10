@@ -4,7 +4,6 @@
 
 int main() {
     Game game;
-    game.MostrarSplashScreen();
     game.BuclePrincipal();
     return 0;
 }

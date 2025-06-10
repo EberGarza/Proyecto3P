@@ -18,7 +18,7 @@ MAIN_EXE := $(BIN_DIR)/bin.exe
 # Compilar el ejecutable principal enlazando los demás módulos
 $(MAIN_EXE): $(SRC_FILES)
 	@echo Compilando $< para Cut the Rope...
-	g++ $(SRC_FILES) -o $(MAIN_EXE) $(SFML) -I$(INCLUDE_DIR)
+	g++ $(SRC_FILES) -o $(MAIN_EXE) $(SFML) -I$(INCLUDE_DIR) -IC:/msys64/mingw64/include
 
 # Compilar todo el proyecto
 all: $(MAIN_EXE)
