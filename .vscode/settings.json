@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "charconv": "cpp"
+        "charconv": "cpp",
+        "iosfwd": "cpp"
     }
 }

@@ -1,36 +1,34 @@
-# Makefile para el proyecto "Cut the Rope" versión capibara.
-# Autores: Eber Omar Garza Fuentes, Fatima Getsemani Lopez Plascencia.
-# Fecha: 2025-05-29
+# Makefile para compilar el proyecto Cut the Capibara.
+# Asegúrate de tener instalado MinGW y SFML en tu sistema.
+# Este Makefile está diseñado para ser usado en un entorno de Windows con MSYS2.
 
-# Directorios de código fuente y binarios
+# Directorios
 SRC_DIR := src
-BIN_DIR := bin
 INCLUDE_DIR := include
+BIN_DIR := bin
 
-# Librerías necesarias para el proyecto (SFML y Box2D)
-SFML := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d
-
-# Archivos fuente y ejecutable principal
+# Archivos fuente y ejecutable
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-MAIN_SRC := $(SRC_DIR)/00_CutTheRope.cpp
-MAIN_EXE := $(BIN_DIR)/bin.exe
+EXE := $(BIN_DIR)/game.exe
 
-# Compilar el ejecutable principal enlazando los demás módulos
-$(MAIN_EXE): $(SRC_FILES)
-	@echo Compilando $< para Cut the Rope...
-	g++ $(SRC_FILES) -o $(MAIN_EXE) $(SFML) -I$(INCLUDE_DIR) -IC:/msys64/mingw64/include
+# Compilador y flags
+CXX := g++
+CXXFLAGS := -std=c++17 -I$(INCLUDE_DIR) -IC:/msys64/mingw64/include -g
+LDFLAGS := -LC:/msys64/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system
 
-# Compilar todo el proyecto
-all: $(MAIN_EXE)
-	@echo "Compilación completa de Cut the Rope (versión Capibara)"
+# Regla principal
+all: $(EXE)
 
-# Ejecutar el ejecutable principal
-run: $(MAIN_EXE)
-	./$(MAIN_EXE)
+$(EXE): $(SRC_FILES) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-# Limpiar binarios generados
+$(BIN_DIR):
+	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
+
+run: all
+	./$(EXE)
+
 clean:
-	@echo Limpiando ejecutables de Cut the Rope...
-	del /Q $(BIN_DIR)\*.exe 2>nul || true
+	del /Q $(BIN_DIR)\*.exe 2>nul || exit 0
 
-.PHONY: all clean run
+.PHONY: all run clean
