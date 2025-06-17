@@ -4,6 +4,8 @@
 #include "SplashScreen.hpp"
 #include "Menu.hpp"
 #include "Opciones.hpp"
+#include "Tutorial.hpp"
+#include "Rope.hpp"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Cut the Rope");
@@ -20,7 +22,9 @@ int main() {
         if (opcion == 2) { // Salir
             running = false;
         } else if (opcion == 0) {
-            std::cout << "Iniciar juego (placeholder)" << std::endl;
+            // Iniciar tutorial
+            Tutorial tutorial(window);
+            tutorial.Ejecutar();
         } else if (opcion == 1) {
             Opciones opciones(window);
             opciones.Mostrar();

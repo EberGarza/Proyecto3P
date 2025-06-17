@@ -28,6 +28,16 @@ int Menu::Mostrar() {
         float scaleY = static_cast<float>(sizeWin.y) / sizeImg.y;
         fondoSprite.setScale(scaleX, scaleY);
     }
+    // Título del juego
+    sf::Text titulo;
+    titulo.setFont(fuente);
+    titulo.setString("CUT THE ROPE");
+    titulo.setCharacterSize(56);
+    titulo.setFillColor(sf::Color(255, 220, 80));
+    sf::FloatRect bounds = titulo.getLocalBounds();
+    titulo.setOrigin(bounds.width / 2, bounds.height / 2);
+    titulo.setPosition(ventana.getSize().x / 2, 80);
+    titulo.setRotation(-8.f);
     while (ventana.isOpen()) {
         sf::Event event;
         while (ventana.pollEvent(event)) {
@@ -50,6 +60,7 @@ int Menu::Mostrar() {
         if (fondoCargado) {
             ventana.draw(fondoSprite);
         }
+        ventana.draw(titulo); // Dibujar el título primero
         for (size_t i = 0; i < textosMenu.size(); ++i) {
             textosMenu[i].setFillColor(i == seleccion ? sf::Color::Yellow : sf::Color::White);
             ventana.draw(textosMenu[i]);

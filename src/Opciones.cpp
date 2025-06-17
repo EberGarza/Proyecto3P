@@ -8,14 +8,18 @@
 #include <sstream>
 #include <iostream>
 
-Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resolucionActual(0) {
+Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resolucionActual(0), animX(0.f), animY(0.f), animVel(0.015f), animDirX(1), animDirY(1) {
     #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8); // Forzar salida UTF-8 en consola
     #endif
-    // Forzar literal UTF-8 para la tilde
     items = {u8"Resolución", "Volver"};
     resoluciones = { {800, 600}, {1024, 768}, {1280, 720}, {1366, 768} };
     fuente.loadFromFile("assets/fonts/VCR_OSD_MONO_1.001.ttf");
+    fondoTexture.loadFromFile("assets/images/Fondo_Opciones.png");
+    fondoSprite.setTexture(fondoTexture);
+    figurasAnimTexture.loadFromFile("assets/images/Figuras_Anim.png");
+    figurasAnimSprite.setTexture(figurasAnimTexture);
+    // El escalado se ajustará dinámicamente en Mostrar()
     int fontSize = 36;
     int totalHeight = (int)items.size() * fontSize + ((int)items.size() - 1) * 30;
     int startY = (ventana.getSize().y - totalHeight) / 2;
@@ -27,7 +31,30 @@ Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resoluci
 }
 
 void Opciones::Mostrar() {
+    // Crear el título del menú de opciones
+    sf::Text titulo;
+    titulo.setFont(fuente);
+    titulo.setString("OPCIONES");
+    titulo.setCharacterSize(48);
+    titulo.setFillColor(sf::Color(255, 220, 80));
+    // Centrar horizontalmente y colocar en la parte superior
+    sf::FloatRect bounds = titulo.getLocalBounds();
+    titulo.setOrigin(bounds.width / 2, bounds.height / 2);
+    titulo.setPosition(ventana.getSize().x / 2, 60);
+    titulo.setRotation(-8.f); // Ángulo ligero para realce
+
     bool enOpciones = true;
+    float rangoX = ventana.getSize().x * 0.20f; // 20% del ancho
+    float rangoY = ventana.getSize().y * 0.10f; // 10% del alto
+    float centroX = ventana.getSize().x / 2.f;
+    float centroY = ventana.getSize().y / 2.f;
+    float maxScaleX = (ventana.getSize().x * 0.18f) / figurasAnimTexture.getSize().x;
+    float maxScaleY = (ventana.getSize().y * 0.18f) / figurasAnimTexture.getSize().y;
+    float scale = std::min(maxScaleX, maxScaleY);
+    if (scale > 1.0f) scale = 1.0f;
+    if (scale < 0.25f) scale = 0.25f;
+    figurasAnimSprite.setScale(scale, scale);
+    sf::Vector2f spriteSize(figurasAnimSprite.getGlobalBounds().width, figurasAnimSprite.getGlobalBounds().height);
     while (ventana.isOpen() && enOpciones) {
         sf::Event event;
         while (ventana.pollEvent(event)) {
@@ -75,12 +102,29 @@ void Opciones::Mostrar() {
         if (!textos.empty()) {
             std::string resolStr = std::string(u8"Resolución: < ") + std::to_string(resoluciones[resolucionActual].x) + "x" + std::to_string(resoluciones[resolucionActual].y) + " >";
             textos[0].setString(resolStr);
-            // Restaurar el texto de la opción 'Volver' por si fue sobrescrito
             if (textos.size() > 1) {
                 textos[1].setString("Volver");
             }
         }
-        ventana.clear(sf::Color(40, 40, 60));
+        // Animación diagonal y muy lenta, centrada
+        animX += animVel * animDirX;
+        animY += animVel * animDirY;
+        if (animX > rangoX) animDirX = -1;
+        if (animX < -rangoX) animDirX = 1;
+        if (animY > rangoY) animDirY = -1;
+        if (animY < -rangoY) animDirY = 1;
+        // Efecto infinito: dibujar varias instancias para cubrir el área
+        ventana.clear();
+        ventana.draw(fondoSprite);
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                float posX = centroX - spriteSize.x/2 + animX + dx * spriteSize.x;
+                float posY = centroY - spriteSize.y/2 + animY + dy * spriteSize.y;
+                figurasAnimSprite.setPosition(posX, posY);
+                ventana.draw(figurasAnimSprite);
+            }
+        }
+        ventana.draw(titulo);
         for (size_t i = 0; i < textos.size(); ++i) {
             textos[i].setFillColor(i == seleccion ? sf::Color::Yellow : sf::Color::White);
             ventana.draw(textos[i]);
