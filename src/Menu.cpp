@@ -1,5 +1,6 @@
 // Menu.cpp - Implementación del menú principal
 #include "Menu.hpp"
+#include "Controles.hpp"
 #include <SFML/Graphics.hpp>
 
 Menu::Menu(sf::RenderWindow& win) : ventana(win), seleccion(0) {
@@ -41,6 +42,7 @@ int Menu::Mostrar() {
     while (ventana.isOpen()) {
         sf::Event event;
         while (ventana.pollEvent(event)) {
+            Controles::actualizar(event);
             if (event.type == sf::Event::Closed) {
                 return 2; // Salir
             }
@@ -64,6 +66,19 @@ int Menu::Mostrar() {
         for (size_t i = 0; i < textosMenu.size(); ++i) {
             textosMenu[i].setFillColor(i == seleccion ? sf::Color::Yellow : sf::Color::White);
             ventana.draw(textosMenu[i]);
+        }
+        // Detectar selección con mouse
+        for (size_t i = 0; i < textosMenu.size(); ++i) {
+            auto bounds = textosMenu[i].getGlobalBounds();
+            sf::Vector2i mouse = Controles::mousePos(ventana);
+            if (bounds.contains(static_cast<float>(mouse.x), static_cast<float>(mouse.y))) {
+                textosMenu[i].setFillColor(sf::Color(255, 255, 120)); // Resalta
+                if (Controles::mousePresionado(sf::Mouse::Left)) {
+                    return static_cast<int>(i);
+                }
+            } else {
+                textosMenu[i].setFillColor(sf::Color(255, 255, 255));
+            }
         }
         ventana.display();
     }

@@ -12,12 +12,14 @@ public:
     void setFixedStart(bool fixed); // Fijar el extremo inicial
     void setFixedEnd(bool fixed);   // Fijar el extremo final
     std::vector<sf::Vector2f>& getPoints();
+    void cutAtSegment(size_t segmentIdx); // Declaración, implementación en .cpp
 private:
     std::vector<sf::Vector2f> points;         // Posición actual de cada nodo
     std::vector<sf::Vector2f> prevPoints;     // Posición previa (para Verlet)
     std::vector<sf::CircleShape> nodes;       // Visualización
     sf::Color color;
     int numSegments;
+    float segmentLength; // Longitud fija de cada segmento
     bool fixedStart = true;
     bool fixedEnd = false;
     sf::Vector2f gravity = sf::Vector2f(0.f, 600.f); // px/s^2

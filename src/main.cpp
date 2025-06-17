@@ -6,9 +6,14 @@
 #include "Opciones.hpp"
 #include "Tutorial.hpp"
 #include "Rope.hpp"
+#include "Cake.hpp"
+#include "Controles.hpp"
+#include "AlertaAnim.hpp"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Cut the Rope");
+    // Iniciar en pantalla completa para observar mejor la interacción de los objetos
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    sf::RenderWindow window(desktop, "Cut the Rope", sf::Style::Fullscreen);
     bool running = true;
     bool splashMostrado = false;
     while (running && window.isOpen()) {
