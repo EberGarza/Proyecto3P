@@ -10,6 +10,7 @@ public:
     void update(float dt);
     void draw(sf::RenderWindow& window);
     bool activa() const;
+    void forzarDesactivar(); // Método para desactivar manualmente la alerta
 private:
     sf::Texture textura;
     sf::Sprite sprite;

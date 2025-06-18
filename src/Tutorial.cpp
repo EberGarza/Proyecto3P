@@ -3,6 +3,7 @@
 #include "Controles.hpp"
 #include "Cake.hpp"
 #include "AlertaAnim.hpp"
+#include "Plataforma.hpp"
 #include <iostream>
 #include <cmath> // Agregado para usar std::sqrt
 
@@ -67,12 +68,28 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
             cake = new Cake(pts.back());
     }
     // Inicializar animación de alerta
-    alerta = AlertaAnim();
+    // alerta = AlertaAnim(); // ¡NO reasignar! Esto causa problemas de textura en SFML
+    // Crear plataforma centrada en la parte inferior con ancho fijo (200px)
+    float plataformaAnchoFijo = 200.f;
+    float plataformaScale = plataformaAnchoFijo / 300.f; // Suponiendo que Platform.png tiene 300px de ancho
+    sf::Vector2f plataformaPos(winSize.x/2.f, winSize.y - 60.f); // 60px arriba del borde inferior
+    plataforma = new Plataforma(plataformaPos, plataformaScale);
+    // Usar el borde superior de la plataforma para posicionar al personaje
+    sf::FloatRect platBounds = plataforma->getBounds();
+    float personajeAncho = personajeSprite.getGlobalBounds().width;
+    float personajeAlto = personajeSprite.getGlobalBounds().height;
+    float margenVisual = 4.f; // margen pequeño para que se vea bien
+    personajeSprite.setPosition(
+        plataformaPos.x - personajeAncho/2.f,
+        platBounds.top - personajeAlto + margenVisual
+    );
+    std::cout << "Personaje Y final: " << personajeSprite.getPosition().y << "\n";
 }
 
 Tutorial::~Tutorial() {
     if (rope) { delete rope; rope = nullptr; }
     if (cake) { delete cake; cake = nullptr; }
+    if (plataforma) { delete plataforma; plataforma = nullptr; }
 }
 
 void Tutorial::Ejecutar() {
@@ -192,7 +209,11 @@ void Tutorial::Ejecutar() {
                 animFade += dt / animFadeSpeed;
                 // Mostrar alerta inmediatamente al cortar la cuerda
                 if (!alertaMostrada) {
-                    personajeSprite.setTexture(personajeAlertaTexture, true);
+                    // Activar alerta visual sobre el personaje
+                    sf::FloatRect pjBounds = personajeSprite.getGlobalBounds();
+                    sf::Vector2f pjCenter(pjBounds.left + pjBounds.width/2.f, pjBounds.top + pjBounds.height/2.f);
+                    float pjScale = personajeSprite.getScale().x;
+                    alerta.activar(pjCenter, pjScale);
                     alertaMostrada = true;
                 }
             }
@@ -211,6 +232,7 @@ void Tutorial::Ejecutar() {
             if (dist <= cakeRadius + pjRadius) {
                 personajeSprite.setTexture(personajeFrames[personajeFrameActual], true);
                 alertaMostrada = false;
+                alerta.forzarDesactivar(); // Ocultar alerta manualmente
             }
         }
         alerta.update(dt);
@@ -243,8 +265,13 @@ void Tutorial::Ejecutar() {
             }
         }
         if (cake) cake->draw(ventana);
-        alerta.draw(ventana);
-        ventana.draw(personajeSprite);
+        // Mostrar solo la alerta O el personaje, nunca ambos
+        if (alerta.activa()) {
+            alerta.draw(ventana);
+        } else {
+            ventana.draw(personajeSprite);
+        }
+        if (plataforma) plataforma->draw(ventana);
         ventana.display();
         // Eliminar cuerda visualmente tras la animación
         if (cuerdaCortada && animFade >= 1.f) {

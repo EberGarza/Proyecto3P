@@ -5,6 +5,7 @@
 #include "Rope.hpp"
 #include "Cake.hpp"
 #include "AlertaAnim.hpp"
+#include "Plataforma.hpp"
 #include <vector>
 
 class Tutorial {
@@ -28,6 +29,7 @@ private:
     Rope* rope = nullptr;
     Cake* cake = nullptr;
     AlertaAnim alerta;
+    Plataforma* plataforma = nullptr;
 };
 
 #endif // TUTORIAL_HPP

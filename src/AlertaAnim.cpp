@@ -3,14 +3,24 @@
 #include <iostream> // Para mensajes de error en consola
 
 AlertaAnim::AlertaAnim() {
-    if (!textura.loadFromFile("assets/images/Alert_Ani_1.png")) {
-        std::cerr << "No se pudo cargar Alert_Ani_1.png\n";
+    bool cargada = textura.loadFromFile("assets/images/Alert_Ani_1.png");
+    if (!cargada) {
+        std::cerr << "[AlertaAnim] No se pudo cargar Alert_Ani_1.png\n";
+        // Prueba con otra textura conocida
+        cargada = textura.loadFromFile("assets/images/cake.png");
+        if (cargada) {
+            std::cerr << "[AlertaAnim] Se cargó cake.png como prueba.\n";
+        } else {
+            std::cerr << "[AlertaAnim] Tampoco se pudo cargar cake.png.\n";
+        }
     }
     sprite.setTexture(textura);
     sprite.setOrigin(textura.getSize().x/2.f, textura.getSize().y); // origen en la base
     visible = false;
     timer = 0.f;
     duracion = 1.0f; // Duración aumentada
+    // Forzar color de fondo para detectar transparencia
+    sprite.setColor(sf::Color(255, 255, 255, 255));
 }
 
 void AlertaAnim::activar(const sf::Vector2f& pos, float scale) {
@@ -29,9 +39,16 @@ void AlertaAnim::update(float dt) {
 }
 
 void AlertaAnim::draw(sf::RenderWindow& window) {
-    if (visible) window.draw(sprite);
+    if (visible) {
+        window.draw(sprite);
+    }
 }
 
 bool AlertaAnim::activa() const {
     return visible;
+}
+
+void AlertaAnim::forzarDesactivar() {
+    visible = false;
+    timer = 0.f;
 }
