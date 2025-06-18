@@ -35,8 +35,8 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
         }
     }
     personajeSprite.setTexture(personajeFrames[0]);
-    // Escalar personaje relativo al alto de la ventana (más grande)
-    float personajeScale = (winSize.y * 0.18f) / personajeFrames[0].getSize().y;
+    // Escalar personaje relativo al alto de la ventana (más pequeño)
+    float personajeScale = (winSize.y * 0.12f) / personajeFrames[0].getSize().y;
     personajeSprite.setScale(personajeScale, personajeScale);
     personajeSprite.setPosition(winSize.x / 2.f - personajeSprite.getGlobalBounds().width / 2.f, winSize.y - personajeSprite.getGlobalBounds().height - 40);
     // Cargar tornillo y posicionar en el centro superior
@@ -44,18 +44,16 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
         std::cerr << "No se pudo cargar el tornillo.\n";
     }
     tornilloSprite.setTexture(tornilloTexture);
-    float tornilloScale = (winSize.x * 0.06f) / tornilloTexture.getSize().x;
+    // Hacer el tornillo aún más pequeño
+    float tornilloScale = (winSize.x * 0.03f) / tornilloTexture.getSize().x; // Más pequeño
     tornilloSprite.setScale(tornilloScale, tornilloScale);
     tornilloSprite.setOrigin(tornilloTexture.getSize().x/2.f, tornilloTexture.getSize().y/2.f);
     // Margen superior de 2 cm (≈ 75.6 px a 96 ppi)
     float margenSuperior = 2.f * 37.8f; // 75.6 px
     tornilloSprite.setPosition(winSize.x/2.f, margenSuperior + tornilloTexture.getSize().y * tornilloScale / 2.f);
-    // Crear cuerda colgando desde el tornillo al centro de la pantalla
     // Longitud máxima de la cuerda: 250 píxeles o hasta el borde inferior visible
-    float maxLargoCm = 30.f;
-    float maxLargoPx = maxLargoCm * 37.8f; // ≈ 1134 px
-    float espacioDisponible = winSize.y - (tornilloSprite.getPosition().y + tornilloTexture.getSize().y * tornilloScale / 2.f) - 20.f; // 20 px de margen inferior
     float largoFinal = std::min(250.f, winSize.y - (tornilloSprite.getPosition().y + tornilloTexture.getSize().y * tornilloScale / 2.f) - 20.f);
+    // La cuerda debe salir del centro del tornillo
     sf::Vector2f start = tornilloSprite.getPosition();
     sf::Vector2f end = start + sf::Vector2f(0, largoFinal);
     rope = new Rope(start, end, 18);
@@ -71,14 +69,21 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
     // alerta = AlertaAnim(); // ¡NO reasignar! Esto causa problemas de textura en SFML
     // Crear plataforma centrada en la parte inferior con ancho fijo (200px)
     float plataformaAnchoFijo = 200.f;
-    float plataformaScale = plataformaAnchoFijo / 300.f; // Suponiendo que Platform.png tiene 300px de ancho
+    float plataformaScale = plataformaAnchoFijo / static_cast<float>(plataforma ? plataforma->getBounds().width : 4000.f); // Usar ancho real de la textura
+    // Mejor: obtener el ancho real de la textura
+    float anchoTexturaPlataforma = 4000.f;
+    sf::Texture tempPlataformaTex;
+    if (tempPlataformaTex.loadFromFile("assets/images/Platform.png")) {
+        anchoTexturaPlataforma = static_cast<float>(tempPlataformaTex.getSize().x);
+    }
+    plataformaScale = plataformaAnchoFijo / anchoTexturaPlataforma;
     sf::Vector2f plataformaPos(winSize.x/2.f, winSize.y - 60.f); // 60px arriba del borde inferior
     plataforma = new Plataforma(plataformaPos, plataformaScale);
     // Usar el borde superior de la plataforma para posicionar al personaje
     sf::FloatRect platBounds = plataforma->getBounds();
     float personajeAncho = personajeSprite.getGlobalBounds().width;
     float personajeAlto = personajeSprite.getGlobalBounds().height;
-    float margenVisual = 4.f; // margen pequeño para que se vea bien
+    float margenVisual = -2.f; // Baja el personaje 15 píxeles más respecto al ajuste anterior
     personajeSprite.setPosition(
         plataformaPos.x - personajeAncho/2.f,
         platBounds.top - personajeAlto + margenVisual
@@ -148,6 +153,7 @@ void Tutorial::Ejecutar() {
     sf::Texture personajeAlertaTexture;
     bool personajeEnAlerta = false;
     bool alertaMostrada = false;
+    bool alertaYaEjecutada = false;
     while (ventana.isOpen() && enNivel) {
         float dt = clock.restart().asSeconds();
         // Animación del personaje
@@ -207,14 +213,21 @@ void Tutorial::Ejecutar() {
                 pos.y += cakeVelY * dt;
                 cake->setPosition(pos);
                 animFade += dt / animFadeSpeed;
-                // Mostrar alerta inmediatamente al cortar la cuerda
-                if (!alertaMostrada) {
-                    // Activar alerta visual sobre el personaje
-                    sf::FloatRect pjBounds = personajeSprite.getGlobalBounds();
-                    sf::Vector2f pjCenter(pjBounds.left + pjBounds.width/2.f, pjBounds.top + pjBounds.height/2.f);
-                    float pjScale = personajeSprite.getScale().x;
-                    alerta.activar(pjCenter, pjScale);
-                    alertaMostrada = true;
+                // Mostrar alerta solo una vez
+                if (!alertaYaEjecutada) {
+                    if (!alertaMostrada && !alerta.activa()) {
+                        // Activar alerta visual sobre el personaje
+                        sf::FloatRect pjBounds = personajeSprite.getGlobalBounds();
+                        sf::Vector2f pjCenter(pjBounds.left + pjBounds.width/2.f, pjBounds.top + pjBounds.height/2.f);
+                        float pjScale = personajeSprite.getScale().x;
+                        alerta.activar(pjCenter, pjScale);
+                        alertaMostrada = true;
+                        // Pausar animación del personaje
+                        personajeAnimTimer = 0.f;
+                    }
+                    if (alertaMostrada && !alerta.activa()) {
+                        alertaYaEjecutada = true;
+                    }
                 }
             }
             cake->update(dt);
@@ -233,6 +246,8 @@ void Tutorial::Ejecutar() {
                 personajeSprite.setTexture(personajeFrames[personajeFrameActual], true);
                 alertaMostrada = false;
                 alerta.forzarDesactivar(); // Ocultar alerta manualmente
+                // Reanudar animación del personaje
+                personajeAnimTimer = 0.f;
             }
         }
         alerta.update(dt);

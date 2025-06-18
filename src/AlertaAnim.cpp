@@ -15,7 +15,8 @@ AlertaAnim::AlertaAnim() {
         }
     }
     sprite.setTexture(textura);
-    sprite.setOrigin(textura.getSize().x/2.f, textura.getSize().y); // origen en la base
+    // Cambiar origen: centro de la imagen (como el personaje)
+    sprite.setOrigin(textura.getSize().x/2.f, textura.getSize().y/2.f);
     visible = false;
     timer = 0.f;
     duracion = 1.0f; // Duración aumentada
@@ -24,8 +25,8 @@ AlertaAnim::AlertaAnim() {
 }
 
 void AlertaAnim::activar(const sf::Vector2f& pos, float scale) {
-    // Posicionar justo sobre la cabeza del personaje
-    sprite.setPosition(pos.x, pos.y - 60 * scale); // 60 px arriba del centro
+    // Posicionar exactamente en el centro del personaje, pero 150 píxeles más arriba
+    sprite.setPosition(pos.x, pos.y - 150.f * scale);
     sprite.setScale(scale, scale);
     visible = true;
     timer = 0.f;
