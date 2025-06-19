@@ -10,6 +10,7 @@
 #include "MenuControles.hpp"
 #include "AlertaAnim.hpp"
 #include "Plataforma.hpp"
+#include "Victoria.hpp"
 
 int main() {
     // Iniciar en pantalla completa para observar mejor la interacción de los objetos

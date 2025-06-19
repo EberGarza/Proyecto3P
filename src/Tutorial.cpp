@@ -4,6 +4,7 @@
 #include "Cake.hpp"
 #include "AlertaAnim.hpp"
 #include "Plataforma.hpp"
+#include "Victoria.hpp" // Incluir Victoria.hpp para la clase Victoria
 #include <iostream>
 #include <cmath> // Agregado para usar std::sqrt
 
@@ -88,7 +89,6 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
         plataformaPos.x - personajeAncho/2.f,
         platBounds.top - personajeAlto + margenVisual
     );
-    std::cout << "Personaje Y final: " << personajeSprite.getPosition().y << "\n";
 }
 
 Tutorial::~Tutorial() {
@@ -154,6 +154,7 @@ void Tutorial::Ejecutar() {
     bool personajeEnAlerta = false;
     bool alertaMostrada = false;
     bool alertaYaEjecutada = false;
+    Victoria* victoria = nullptr;
     while (ventana.isOpen() && enNivel) {
         float dt = clock.restart().asSeconds();
         // Animación del personaje
@@ -221,10 +222,23 @@ void Tutorial::Ejecutar() {
                 cakeVelY += 600.f * dt; // gravedad reducida
                 sf::Vector2f pos = cake->getPosition();
                 pos.y += cakeVelY * dt;
+                // Detener el pastel al llegar al personaje
+                sf::FloatRect pjBounds = personajeSprite.getGlobalBounds();
+                float pjY = pjBounds.top + pjBounds.height / 2.f;
+                if (pos.y >= pjY) {
+                    pos.y = pjY;
+                    cakeVelY = 0.f;
+                    if (!victoria) {
+                        victoria = new Victoria(ventana);
+                        victoria->setReferenceSprite(&personajeSprite);
+                        victoria->setScaleAndPositionFromSprite(personajeSprite);
+                        victoria->start();
+                    }
+                }
                 cake->setPosition(pos);
                 animFade += dt / animFadeSpeed;
                 // Mostrar alerta solo una vez
-                if (!alertaYaEjecutada) {
+                if (!alertaYaEjecutada && !victoria) {
                     if (!alertaMostrada && !alerta.activa()) {
                         // Activar alerta visual sobre el personaje
                         sf::FloatRect pjBounds = personajeSprite.getGlobalBounds();
@@ -260,7 +274,30 @@ void Tutorial::Ejecutar() {
                 personajeAnimTimer = 0.f;
             }
         }
-        alerta.update(dt);
+        // Lógica de victoria y colisión
+        if (alertaMostrada && cake) {
+            // Centro del pastel
+            sf::Vector2f cakePos = cake->getPosition();
+            float cakeRadius = cake->getRadius();
+            // Centro del personaje
+            sf::FloatRect pjBounds = personajeSprite.getGlobalBounds();
+            sf::Vector2f pjCenter(pjBounds.left + pjBounds.width/2.f, pjBounds.top + pjBounds.height/2.f);
+            float pjRadius = std::min(pjBounds.width, pjBounds.height) / 2.f * 0.85f; // margen para colisión
+            float dist = std::sqrt((cakePos.x - pjCenter.x)*(cakePos.x - pjCenter.x) + (cakePos.y - pjCenter.y)*(cakePos.y - pjCenter.y));
+            if (dist <= cakeRadius + pjRadius) {
+                if (!victoria) {
+                    victoria = new Victoria(ventana);
+                    victoria->setReferenceSprite(&personajeSprite);
+                    victoria->setPosition(pjCenter.x, pjCenter.y); // Ahora el sprite está centrado
+                    victoria->start();
+                }
+                alertaMostrada = false;
+                alerta.forzarDesactivar(); // Ocultar alerta manualmente
+            }
+        }
+        if (victoria) {
+            victoria->update(dt);
+        }
         ventana.clear(sf::Color(100, 180, 255));
         ventana.draw(fondoSprite);
         ventana.draw(tornilloSprite);
@@ -289,18 +326,27 @@ void Tutorial::Ejecutar() {
                 }
             }
         }
-        if (cake) cake->draw(ventana);
-        // Mostrar solo la alerta O el personaje, nunca ambos
-        if (alerta.activa()) {
-            alerta.draw(ventana);
+        // Dibujo de victoria siempre por encima de todo
+        if (victoria && !victoria->isFinished()) {
+            victoria->draw();
         } else {
-            ventana.draw(personajeSprite);
+            if (cake) cake->draw(ventana);
+            if (!victoria && alerta.activa()) {
+                alerta.draw(ventana);
+            } else if (!victoria) {
+                ventana.draw(personajeSprite);
+            }
         }
         if (plataforma) plataforma->draw(ventana);
         ventana.display();
         // Eliminar cuerda visualmente tras la animación
         if (cuerdaCortada && animFade >= 1.f) {
             if (rope) { delete rope; rope = nullptr; }
+        }
+        if (victoria && victoria->isFinished()) {
+            delete victoria;
+            victoria = nullptr;
+            // Aquí puedes agregar lógica para pasar al siguiente nivel o mostrar un mensaje de victoria
         }
     }
 }
