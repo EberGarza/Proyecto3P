@@ -15,7 +15,7 @@
 int main() {
     // Iniciar en pantalla completa para observar mejor la interacción de los objetos
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktop, "Cut the Rope", sf::Style::Fullscreen);
+    sf::RenderWindow window(desktop, "Cut the Capibara", sf::Style::Fullscreen);
     bool running = true;
     bool splashMostrado = false;
     while (running && window.isOpen()) {
