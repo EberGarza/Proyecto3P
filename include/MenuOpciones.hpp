@@ -1,6 +1,6 @@
 // MenuOpciones.hpp - Declaración de la clase MenuOpciones (menú de opciones)
-#ifndef MENU_OPCIONES_HPP
-#define MENU_OPCIONES_HPP
+#ifndef MENUOPCIONES_HPP
+#define MENUOPCIONES_HPP
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
@@ -36,4 +36,4 @@ private:
     bool musicPlaying;
 };
 
-#endif // MENU_OPCIONES_HPP
+#endif // MENUOPCIONES_HPP
