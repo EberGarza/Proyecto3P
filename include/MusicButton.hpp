@@ -1,3 +1,6 @@
+#ifndef MUSIC_BUTTON_HPP
+#define MUSIC_BUTTON_HPP
+
 #include "Music.hpp"
 #include <SFML/Graphics.hpp>
 
@@ -19,3 +22,5 @@ private:
     sf::Texture texture;
     sf::Sprite sprite;
 };
+
+#endif // MUSIC_BUTTON_HPP

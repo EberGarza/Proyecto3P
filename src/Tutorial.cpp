@@ -4,11 +4,12 @@
 #include "Cake.hpp"
 #include "AlertaAnim.hpp"
 #include "Plataforma.hpp"
-#include "Victoria.hpp" // Incluir Victoria.hpp para la clase Victoria
+#include "Victoria.hpp" 
+#include "PantallaVictoria.hpp" // Incluir la nueva pantalla de victoria
 #include <iostream>
 #include <cmath> // Agregado para usar std::sqrt
 
-Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
+Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win), musicPlaying(false) {
     // Cargar fondo del nivel
     if (!fondoTexture.loadFromFile("assets/images/Tutorial.png")) {
         std::cerr << "No se pudo cargar el fondo del tutorial.\n";
@@ -20,6 +21,12 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
     float scaleX = static_cast<float>(winSize.x) / texSize.x;
     float scaleY = static_cast<float>(winSize.y) / texSize.y;
     fondoSprite.setScale(scaleX, scaleY);
+    
+    // Cargar música
+    if (!music.load("assets/sound/Game_t.ogg")) {
+        std::cerr << "[ERROR] No se pudo cargar el archivo de música: assets/sound/Game_t.ogg\n";
+    }
+    
     // Cargar frames de animación del personaje
     personajeFrames.clear();
     for (int i = 2; i <= 9; ++i) {
@@ -40,6 +47,24 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win) {
     float personajeScale = (winSize.y * 0.12f) / personajeFrames[0].getSize().y;
     personajeSprite.setScale(personajeScale, personajeScale);
     personajeSprite.setPosition(winSize.x / 2.f - personajeSprite.getGlobalBounds().width / 2.f, winSize.y - personajeSprite.getGlobalBounds().height - 40);
+      // Inicializar estrellas
+    // Creamos 3 estrellas que se mostrarán en la esquina superior izquierda
+    for (int i = 0; i < 3; i++) {
+        Estrella* estrella = new Estrella();
+        estrellas.push_back(estrella);
+    }
+      // Posicionar las estrellas en la esquina superior izquierda, mucho más pequeñas y juntas
+    float margenX = 40.0f;
+    float margenY = 40.0f;
+    float escalaEstrella = 0.25f; // Escala mucho más pequeña
+    float espaciadoX = 30.0f; // Espacio entre estrellas
+    
+    if (estrellas.size() >= 3) {
+        for (int i = 0; i < 3; i++) {
+            estrellas[i]->inicializar(margenX + (i * espaciadoX), margenY, escalaEstrella);
+        }
+    }
+    
     // Cargar tornillo y posicionar en el centro superior
     if (!tornilloTexture.loadFromFile("assets/images/Tornillo.png")) {
         std::cerr << "No se pudo cargar el tornillo.\n";
@@ -95,6 +120,12 @@ Tutorial::~Tutorial() {
     if (rope) { delete rope; rope = nullptr; }
     if (cake) { delete cake; cake = nullptr; }
     if (plataforma) { delete plataforma; plataforma = nullptr; }
+    
+    // Liberar memoria de las estrellas
+    for (auto& estrella : estrellas) {
+        delete estrella;
+    }
+    estrellas.clear();
 }
 
 void Tutorial::Ejecutar() {
@@ -187,6 +218,9 @@ void Tutorial::Ejecutar() {
             }
             // Obtener la posición del mouse cada frame para evitar retrasos
             sf::Vector2f mousePosFrame = ventana.mapPixelToCoords(MenuControles::mousePos(ventana));
+              // Ya no necesitamos comprobar colisiones con el mouse
+            // Las estrellas se recogerán automáticamente al completar el nivel
+            
             if (MenuControles::Aceptar() && rope && !cuerdaCortada) {
                 float minDist = 16.f; // tolerancia en píxeles
                 size_t cutIdx = rope->getPoints().size();
@@ -284,12 +318,19 @@ void Tutorial::Ejecutar() {
             sf::Vector2f pjCenter(pjBounds.left + pjBounds.width/2.f, pjBounds.top + pjBounds.height/2.f);
             float pjRadius = std::min(pjBounds.width, pjBounds.height) / 2.f * 0.85f; // margen para colisión
             float dist = std::sqrt((cakePos.x - pjCenter.x)*(cakePos.x - pjCenter.x) + (cakePos.y - pjCenter.y)*(cakePos.y - pjCenter.y));
-            if (dist <= cakeRadius + pjRadius) {
-                if (!victoria) {
+            if (dist <= cakeRadius + pjRadius) {                if (!victoria) {
                     victoria = new Victoria(ventana);
                     victoria->setReferenceSprite(&personajeSprite);
                     victoria->setPosition(pjCenter.x, pjCenter.y); // Ahora el sprite está centrado
                     victoria->start();
+                    
+                    // Al completar el nivel, recoger todas las estrellas que no se hayan recogido aún
+                    for (auto& estrella : estrellas) {
+                        if (!estrella->estaRecogida()) {
+                            estrella->recoger();
+                            estrellasRecogidas++;
+                        }
+                    }
                 }
                 alertaMostrada = false;
                 alerta.forzarDesactivar(); // Ocultar alerta manualmente
@@ -298,9 +339,29 @@ void Tutorial::Ejecutar() {
         if (victoria) {
             victoria->update(dt);
         }
+        
+        // Actualizar estrellas
+        for (auto& estrella : estrellas) {
+            estrella->actualizar(dt);
+        }
+        
         ventana.clear(sf::Color(100, 180, 255));
         ventana.draw(fondoSprite);
         ventana.draw(tornilloSprite);
+          // Dibujar fondo para las estrellas para que se vean mejor
+    sf::RectangleShape fondoEstrellas;
+    fondoEstrellas.setSize(sf::Vector2f(110.0f, 35.0f));
+    fondoEstrellas.setPosition(25.0f, 25.0f);
+    fondoEstrellas.setFillColor(sf::Color(0, 0, 0, 128)); // Semi-transparente
+    fondoEstrellas.setOutlineColor(sf::Color(255, 215, 0)); // Dorado
+    fondoEstrellas.setOutlineThickness(1.5f);
+    ventana.draw(fondoEstrellas);
+    
+    // Dibujar las estrellas
+    for (auto& estrella : estrellas) {
+        estrella->dibujar(ventana);
+    }
+        
         if (rope) {
             if (!cuerdaCortada) {
                 rope->draw(ventana);
@@ -338,6 +399,26 @@ void Tutorial::Ejecutar() {
             }
         }
         if (plataforma) plataforma->draw(ventana);
+        
+        // Dibuja el botón de música
+        musicBtn.draw(ventana);
+        
+        // Detecta click en el botón de música
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            sf::Vector2i mouse = sf::Mouse::getPosition(ventana);
+            if (musicBtn.isClicked(mouse)) {
+                if (musicPlaying) {
+                    music.pause();
+                    musicPlaying = false;
+                } else {
+                    music.play();
+                    musicPlaying = true;
+                }
+                // Espera a que se suelte el botón para evitar múltiples toggles
+                while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
+            }
+        }
+        
         ventana.display();
         // Eliminar cuerda visualmente tras la animación
         if (cuerdaCortada && animFade >= 1.f) {
@@ -346,7 +427,14 @@ void Tutorial::Ejecutar() {
         if (victoria && victoria->isFinished()) {
             delete victoria;
             victoria = nullptr;
-            // Aquí puedes agregar lógica para pasar al siguiente nivel o mostrar un mensaje de victoria
+            
+            // Mostrar la pantalla de victoria con el número de estrellas recogidas
+            PantallaVictoria pantallaVictoria(ventana);
+            pantallaVictoria.setEstrellasRecogidas(estrellasRecogidas);
+            pantallaVictoria.mostrar();
+            
+            // Al salir de la pantalla de victoria, finalizar el nivel
+            enNivel = false;
         }
     }
 }

@@ -9,7 +9,8 @@
 #include <sstream>
 #include <iostream>
 
-Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resolucionActual(0), animX(0.f), animY(0.f), animVel(0.015f), animDirX(1), animDirY(1) {
+Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resolucionActual(0), 
+    animX(0.f), animY(0.f), animVel(0.015f), animDirX(1), animDirY(1), musicPlaying(false) {
     #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8); // Forzar salida UTF-8 en consola
     #endif
@@ -20,6 +21,12 @@ Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resoluci
     fondoSprite.setTexture(fondoTexture);
     figurasAnimTexture.loadFromFile("assets/images/Figuras_Anim.png");
     figurasAnimSprite.setTexture(figurasAnimTexture);
+    
+    // Cargar música
+    if (!music.load("assets/sound/MenuOpciones.ogg")) {
+        std::cerr << "[ERROR] No se pudo cargar el archivo de música: assets/sound/MenuOpciones.ogg\n";
+    }
+    
     // El escalado se ajustará dinámicamente en Mostrar()
     int fontSize = 36;
     int totalHeight = (int)items.size() * fontSize + ((int)items.size() - 1) * 30;
@@ -97,6 +104,14 @@ void Opciones::Mostrar() {
                     if (seleccion == 0) {
                         resolucionActual = (resolucionActual + 1) % resoluciones.size();
                     }
+                } else if (event.key.code == sf::Keyboard::M) {
+                    // Alternar música
+                    musicPlaying = !musicPlaying;
+                    if (musicPlaying) {
+                        music.play();
+                    } else {
+                        music.stop();
+                    }
                 }
             }
         }
@@ -131,6 +146,26 @@ void Opciones::Mostrar() {
             textos[i].setFillColor(i == seleccion ? sf::Color::Yellow : sf::Color::White);
             ventana.draw(textos[i]);
         }
+        
+        // Dibuja el botón de música
+        musicBtn.draw(ventana);
+        
+        // Detecta click en el botón de música
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            sf::Vector2i mouse = sf::Mouse::getPosition(ventana);
+            if (musicBtn.isClicked(mouse)) {
+                if (musicPlaying) {
+                    music.pause();
+                    musicPlaying = false;
+                } else {
+                    music.play();
+                    musicPlaying = true;
+                }
+                // Espera a que se suelte el botón para evitar múltiples toggles
+                while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
+            }
+        }
+        
         ventana.display();
     }
 }
