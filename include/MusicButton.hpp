@@ -5,10 +5,10 @@ class MusicButton {
 public:
     MusicButton() {
         texture.loadFromFile("assets/images/speaker.png");
+        // Reducir el tamaño del ícono a 1/4 del original
         sprite.setTexture(texture);
-        sprite.setScale(0.08f, 0.08f); // Botón más pequeño
+        sprite.setScale(0.02f, 0.02f); // Mucho más pequeño
         // Centrar en la parte inferior central
-        // La posición se ajustará en el draw usando el tamaño de la ventana
         sprite.setPosition(0, 0); // Se ajusta dinámicamente
     }
     void draw(sf::RenderWindow& window) {
@@ -19,8 +19,13 @@ public:
         float y = winSize.y - bounds.height - 30.f; // 30px del borde inferior
         sprite.setPosition(x, y);
         window.draw(sprite);
-        sf::RectangleShape outline(sf::Vector2f(bounds.width, bounds.height));
-        outline.setPosition(x, y);
+        // Hacer el contorno rojo apenas más grande que el ícono
+        float outlineW = bounds.width + 4.f;
+        float outlineH = bounds.height + 4.f;
+        float outlineX = x - 2.f;
+        float outlineY = y - 2.f;
+        sf::RectangleShape outline(sf::Vector2f(outlineW, outlineH));
+        outline.setPosition(outlineX, outlineY);
         outline.setFillColor(sf::Color::Transparent);
         outline.setOutlineColor(sf::Color::Red);
         outline.setOutlineThickness(2.f);
