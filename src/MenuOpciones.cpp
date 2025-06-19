@@ -1,15 +1,15 @@
-// Opciones.cpp - Implementación del menú de opciones
+// MenuOpciones.cpp - Implementación del menú de opciones
 // Archivo guardado en UTF-8 sin BOM
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include "Opciones.hpp"
+#include "MenuOpciones.hpp"
 #include "MenuControles.hpp"
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include <iostream>
 
-Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resolucionActual(0), 
+MenuOpciones::MenuOpciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resolucionActual(0), 
     animX(0.f), animY(0.f), animVel(0.015f), animDirX(1), animDirY(1), musicPlaying(false) {
     #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8); // Forzar salida UTF-8 en consola
@@ -38,7 +38,7 @@ Opciones::Opciones(sf::RenderWindow& win) : ventana(win), seleccion(0), resoluci
     }
 }
 
-void Opciones::Mostrar() {
+void MenuOpciones::Mostrar() {
     // Crear el título del menú de opciones
     sf::Text titulo;
     titulo.setFont(fuente);
