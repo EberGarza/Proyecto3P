@@ -5,41 +5,25 @@
 Estrella::Estrella() :
     frameActual(0),
     tiempoAcumulado(0.0f),
-    duracionFrame(0.1f), // 10 frames por segundo para la animación
+    duracionFrame(0.15f),
     recogida(false),
     animacionFinalizada(false),
     tiempoEfecto(0.0f)
 {
-    // Cargar las texturas de la animación de la estrella
-    texturas.resize(5); // Suponemos que hay 5 frames de animación
+    // Primero redimensionar el vector antes de acceder a sus elementos
+    texturas.resize(1); // Solo necesitamos un frame para la apariencia inicial
     
-    // Cargar textura inicial
+    // Luego cargar la textura
     if (!texturas[0].loadFromFile("assets/images/Star_Succesion_0.png")) {
         std::cerr << "Error al cargar la textura de la estrella: Star_Succesion_0.png" << std::endl;
+    } else {
+        // Solo configurar el sprite si la textura se cargó correctamente
+        sprite.setTexture(texturas[0]);
+        
+        // Centrar origen en el centro de la textura
+        sf::Vector2u texSize = texturas[0].getSize();
+        sprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f);
     }
-    
-    // Cargar texturas de animación cuando se recoge
-    if (!texturas[1].loadFromFile("assets/images/Star_Succesion_1.png")) {
-        std::cerr << "Error al cargar la textura de la estrella: Star_Succesion_1.png" << std::endl;
-    }
-    
-    if (!texturas[2].loadFromFile("assets/images/Star_Succesion_2.png")) {
-        std::cerr << "Error al cargar la textura de la estrella: Star_Succesion_2.png" << std::endl;
-    }
-    
-    if (!texturas[3].loadFromFile("assets/images/Star_Succesion_3.png")) {
-        std::cerr << "Error al cargar la textura de la estrella: Star_Succesion_3.png" << std::endl;
-    }
-    
-    // Quinta textura puede ser transparente o una variación final
-    texturas[4] = texturas[3]; // Copiamos la última textura para el último frame
-    
-    // Configurar el sprite con la textura inicial
-    sprite.setTexture(texturas[0]);
-    
-    // Centrar origen en el centro de la textura
-    sf::Vector2u texSize = texturas[0].getSize();
-    sprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f);
 }
 
 Estrella::~Estrella() {
@@ -54,49 +38,28 @@ void Estrella::inicializar(float x, float y, float escala) {
     tiempoEfecto = 0.0f;
     recogida = false;
     animacionFinalizada = false;
-    sprite.setTexture(texturas[0]);
+    sprite.setTexture(texturas[0], true); // true para resetear el rect
     sprite.setColor(sf::Color::White); // Reiniciar color
 }
 
 void Estrella::recoger() {
     if (!recogida) {
         recogida = true;
-        frameActual = 0;
-        tiempoAcumulado = 0.0f;
+        // Al recogerla, simplemente marcamos como recogida
+        // y la animación terminada (para que desaparezca inmediatamente)
+        animacionFinalizada = true;
     }
 }
 
 void Estrella::actualizar(float dt) {
+    // Como ya no tenemos animación, este método es muy sencillo
+    // No hacemos nada si la estrella no está recogida o ya terminó su animación
+    
+    // Si se recogió pero no ha terminado la animación (cosa que no debería suceder
+    // ya que ahora cuando se recoge se marca como animación finalizada directamente)
     if (recogida && !animacionFinalizada) {
-        tiempoAcumulado += dt;
-        tiempoEfecto += dt;
-        
-        if (tiempoAcumulado >= duracionFrame) {
-            tiempoAcumulado -= duracionFrame;
-            frameActual++;
-            
-            if (frameActual < static_cast<int>(texturas.size())) {
-                sprite.setTexture(texturas[frameActual]);
-                
-                // Obtener escala original
-                float escalaOriginal = sprite.getScale().x;
-                
-                // Efecto de brillo y escala al ser recogida
-                float escalaPulso = 1.0f + 0.2f * sin(tiempoEfecto * 10.0f);
-                sprite.setScale(escalaOriginal * escalaPulso, escalaOriginal * escalaPulso);
-                
-                // Aumentar brillo gradualmente
-                int brilloAdicional = static_cast<int>(127.0f * (float(frameActual) / texturas.size()));
-                sf::Color color(
-                    std::min(255, 255 - brilloAdicional),  // Menos rojo para que sea más brillante
-                    std::min(255, 255),                    // Verde al máximo
-                    std::min(255, 128 + brilloAdicional)   // Más azul para efecto brillante
-                );
-                sprite.setColor(color);
-            } else {
-                animacionFinalizada = true;
-            }
-        }
+        // Simplemente marcar como terminada para que desaparezca
+        animacionFinalizada = true;
     }
 }
 
