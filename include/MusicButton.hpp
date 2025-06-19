@@ -11,6 +11,14 @@ public:
     }
     void draw(sf::RenderWindow& window) {
         window.draw(sprite);
+        // Dibuja un contorno rojo alrededor del botón
+        sf::FloatRect bounds = sprite.getGlobalBounds();
+        sf::RectangleShape outline(sf::Vector2f(bounds.width, bounds.height));
+        outline.setPosition(bounds.left, bounds.top);
+        outline.setFillColor(sf::Color::Transparent);
+        outline.setOutlineColor(sf::Color::Red);
+        outline.setOutlineThickness(2.f);
+        window.draw(outline);
     }
     bool isClicked(const sf::Vector2i& mousePos) const {
         return sprite.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
