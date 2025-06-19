@@ -1,0 +1,273 @@
+@startuml Diagrama de Clases - Cut the Capibara
+
+' Estilo y configuración
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+title Diagrama de Clases - Cut the Capibara
+
+' Clases relacionadas a la lógica del juego
+class Rope {
+  -points: vector<Vector2f>
+  -prevPoints: vector<Vector2f>
+  -nodes: vector<CircleShape>
+  -color: Color
+  -numSegments: int
+  -segmentLength: float
+  -fixedStart: bool
+  -fixedEnd: bool
+  -gravity: Vector2f
+  -constraintIterations: int
+  -ropeTexture: Texture
+  -ropeSprite: Sprite
+  +Rope(start: Vector2f, end: Vector2f, segments: int)
+  +update(dt: float): void
+  +draw(window: RenderWindow&): void
+  +setFixedStart(fixed: bool): void
+  +setFixedEnd(fixed: bool): void
+  +getPoints(): vector<Vector2f>&
+  +cutAtSegment(segmentIdx: size_t): void
+}
+
+class Cake {
+  -animFrames: vector<Texture>
+  -animFrame: int
+  -animTimer: float
+  -animSpeed: float
+  -animInterval: float
+  -animElapsed: float
+  -animando: bool
+  -sprite: Sprite
+  -position: Vector2f
+  -radius: float
+  -iniciarAnimacion(): void
+  +Cake(pos: Vector2f)
+  +update(dt: float): void
+  +draw(window: RenderWindow&): void
+  +getPosition(): Vector2f
+  +setPosition(pos: Vector2f): void
+  +getRadius(): float
+}
+
+class Plataforma {
+  -texture: Texture
+  -sprite: Sprite
+  -position: Vector2f
+  +Plataforma(pos: Vector2f)
+  +draw(window: RenderWindow&): void
+  +getPosition(): Vector2f
+  +getGlobalBounds(): FloatRect
+}
+
+class AlertaAnim {
+  -textura: Texture
+  -sprite: Sprite
+  -visible: bool
+  -timer: float
+  -duracion: float
+  +AlertaAnim()
+  +activar(pos: Vector2f, scale: float): void
+  +update(dt: float): void
+  +draw(window: RenderWindow&): void
+  +activa(): bool
+  +forzarDesactivar(): void
+}
+
+' Clases relacionadas a la música y sonido
+class Music {
+  -music: sf::Music
+  -filePath: string
+  +Music()
+  +load(path: string): bool
+  +play(): void
+  +pause(): void
+  +stop(): void
+  +setVolume(volume: float): void
+  +getStatus(): sf::Music::Status
+}
+
+class MusicButton {
+  -texture: Texture
+  -sprite: Sprite
+  +MusicButton()
+  +draw(window: RenderWindow&): void
+  +isClicked(mousePos: Vector2i): bool
+}
+
+' Clases relacionadas a pantallas y menús
+class Menu {
+  -ventana: RenderWindow&
+  -opciones: vector<string>
+  -textosMenu: vector<Text>
+  -fuente: Font
+  -seleccion: int
+  +Menu(win: RenderWindow&)
+  +Mostrar(): OpcionMenu
+}
+
+class MenuOpciones {
+  -ventana: RenderWindow&
+  -items: vector<string>
+  -textos: vector<Text>
+  -fuente: Font
+  -seleccion: int
+  -resoluciones: vector<Vector2u>
+  -resolucionActual: int
+  -fondoTexture: Texture
+  -fondoSprite: Sprite
+  -figurasAnimTexture: Texture
+  -figurasAnimSprite: Sprite
+  -animX: float
+  -animY: float
+  -animVel: float
+  -animDirX: int
+  -animDirY: int
+  -music: Music
+  -musicBtn: MusicButton
+  -musicPlaying: bool
+  +MenuOpciones(win: RenderWindow&)
+  +Mostrar(): void
+}
+
+class MenuControles {
+  -handlerTeclas: array<bool, 256>
+  +actualizar(event: Event&): void
+  +estaPresionada(tecla: Keyboard::Key): bool
+  +mousePosicion(ventana: RenderWindow&): Vector2f
+}
+
+class SplashScreen {
+  -splashTexture: Texture
+  -splashSprite: Sprite
+  +SplashScreen()
+  +Mostrar(ventana: RenderWindow&): void
+}
+
+class Tutorial {
+  -ventana: RenderWindow&
+  -fondoTexture: Texture
+  -fondoSprite: Sprite
+  -personajeFrames: vector<Texture>
+  -personajeSprite: Sprite
+  -personajeAnimTimer: float
+  -personajeFrameActual: int
+  -personajeAnimSpeed: float
+  -tornilloTexture: Texture
+  -tornilloSprite: Sprite
+  -rope: Rope*
+  -cake: Cake*
+  -music: Music
+  -musicBtn: MusicButton
+  -musicPlaying: bool
+  -alerta: AlertaAnim
+  -plataforma: Plataforma*
+  +Tutorial(win: RenderWindow&)
+  +~Tutorial()
+  +Ejecutar(): void
+}
+
+class Victoria {
+  -ventana: RenderWindow&
+  -fondoTexture: Texture
+  -fondoSprite: Sprite
+  -animationFrames: vector<Texture>
+  -animationSprite: Sprite
+  -animationTimer: float
+  -currentFrame: int
+  -animSpeed: float
+  +Victoria(win: RenderWindow&)
+  +Mostrar(): void
+}
+
+class PantallaVictoria {
+  -ventana: RenderWindow&
+  -fondoTexture: Texture
+  -fondoSprite: Sprite
+  -fuente: Font
+  -textoVictoria: Text
+  -textoPresionaEsc: Text
+  -alpha: int
+  -fadeInSpeed: int
+  -textoVisible: bool
+  -parpadeoTimer: float
+  -particulas: vector<RectangleShape>
+  -particulas_vel: vector<Vector2f>
+  +PantallaVictoria(win: RenderWindow&)
+  +Mostrar(): void
+  -actualizarParticulas(): void
+}
+
+class Estrella {
+  -textura: Texture
+  -sprite: Sprite
+  -frames: vector<Texture>
+  -frameActual: int
+  -frameTimer: float
+  -animSpeed: float
+  -position: Vector2f
+  -recogida: bool
+  -animando: bool
+  +Estrella(pos: Vector2f)
+  +update(dt: float): void
+  +draw(window: RenderWindow&): void
+  +getPosition(): Vector2f
+  +getBounds(): FloatRect
+  +recoger(): void
+  +estaRecogida(): bool
+}
+
+' Relaciones entre clases - Lógica de juego
+Tutorial "1" --> "1" Rope : contiene >
+Tutorial "1" --> "1" Cake : contiene >
+Tutorial "1" --> "1" AlertaAnim : contiene >
+Tutorial "1" --> "1" Plataforma : contiene >
+Tutorial "1" --> "1..*" Estrella : contiene >
+Tutorial "1" --> "1" Music : usa >
+Tutorial "1" --> "1" MusicButton : usa >
+
+' Relaciones de Victoria
+Victoria "1" --> "1" PantallaVictoria : muestra >
+
+' Relaciones con MusicButton y Music
+MenuOpciones "1" --> "1" Music : usa >
+MenuOpciones "1" --> "1" MusicButton : usa >
+MusicButton "1" ..> "1" Music : controla >
+
+' Relaciones con MenuControles
+Tutorial "1" --> "1" MenuControles : depende de >
+Victoria "1" --> "1" MenuControles : depende de >
+Menu "1" --> "1" MenuControles : depende de >
+MenuOpciones "1" --> "1" MenuControles : depende de >
+
+' Relaciones del juego principal
+Menu "1" --> "*" OpcionMenu : define >
+Menu "1" ..> "1" Tutorial : inicia si JUGAR >
+Menu "1" ..> "1" MenuOpciones : inicia si OPCIONES >
+Tutorial "1" ..> "1" Victoria : muestra al completar >
+
+' Jerarquía de pantallas y navegación del juego
+note "Flujo del juego" as N1
+SplashScreen <-- N1 : inicia
+Menu <-- SplashScreen : continúa a
+Tutorial <-- Menu : si opción JUGAR
+MenuOpciones <-- Menu : si opción OPCIONES
+Victoria <-- Tutorial : al completar nivel
+PantallaVictoria <-- Victoria : muestra
+
+' Enumeraciones
+enum OpcionMenu {
+  JUGAR = 0
+  OPCIONES
+  SALIR
+}
+
+' Relaciones de funcionalidad
+Rope "1" ..> "1" Cake : sujeta >
+Cake "1" ..> "1" Plataforma : colisiona con >
+Estrella "1" ..> "1" Cake : interactúa con >
+
+@enduml

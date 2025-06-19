@@ -3,8 +3,8 @@
 #include <iostream>
 #include "SplashScreen.hpp"
 #include "Menu.hpp"
-#include "Opciones.hpp"
 #include "Tutorial.hpp"
+#include "MenuOpciones.hpp"
 #include "Rope.hpp"
 #include "Cake.hpp"
 #include "MenuControles.hpp"
@@ -31,9 +31,8 @@ int main() {
         } else if (opcion == 0) {
             // Iniciar tutorial
             Tutorial tutorial(window);
-            tutorial.Ejecutar();
-        } else if (opcion == 1) {
-            Opciones opciones(window);
+            tutorial.Ejecutar();        } else if (opcion == 1) {
+            MenuOpciones opciones(window);
             opciones.Mostrar();
         }
     }
