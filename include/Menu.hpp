@@ -5,10 +5,16 @@
 #include <vector>
 #include <string>
 
+enum OpcionMenu {
+    JUGAR = 0,
+    OPCIONES,
+    SALIR
+};
+
 class Menu {
 public:
     Menu(sf::RenderWindow& win);
-    int Mostrar(); // Devuelve 0: Jugar, 1: Opciones, 2: Salir
+    OpcionMenu Mostrar();
 private:
     sf::RenderWindow& ventana;
     std::vector<std::string> opciones;
