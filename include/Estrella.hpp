@@ -30,6 +30,9 @@ public:
     
     // Comprobar si la animación de recogida ha terminado
     bool animacionTerminada() const;
+
+    // Permitir cambiar la textura desde fuera
+    void setTexture(const sf::Texture& textura);
     
 private:
     sf::Sprite sprite;

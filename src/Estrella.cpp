@@ -80,3 +80,10 @@ bool Estrella::estaRecogida() const {
 bool Estrella::animacionTerminada() const {
     return animacionFinalizada;
 }
+
+void Estrella::setTexture(const sf::Texture& textura) {
+    sprite.setTexture(textura, true);
+    // Centrar origen en el centro de la textura nueva
+    sf::Vector2u texSize = textura.getSize();
+    sprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f);
+}

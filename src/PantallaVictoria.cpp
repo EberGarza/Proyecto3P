@@ -71,14 +71,11 @@ PantallaVictoria::PantallaVictoria(sf::RenderWindow& window) :
     sf::FloatRect instBounds = instruccion.getLocalBounds();
     instruccion.setOrigin(instBounds.width / 2.f, instBounds.height / 2.f);
     instruccion.setPosition(winSize.x / 2.f, winSize.y * 0.85f); // Ajustado para mejor visibilidad
-      // Se eliminó la configuración del texto de estrellas
 }
 
 void PantallaVictoria::mostrar() {
     sf::Clock reloj;
     bool mostrandoPantalla = true;
-    
-    // Se eliminó la actualización del texto de estrellas
     
     // Efecto de aparición gradual
     float opacidad = 0.0f;
@@ -227,7 +224,6 @@ void PantallaVictoria::mostrar() {
             for (const auto& p : particulas) {
                 ventana.draw(p.forma);
             }
-            
             ventana.draw(titulo);
             ventana.draw(mensaje);
             ventana.draw(instruccion);
