@@ -1,6 +1,6 @@
 // Menu.cpp - Implementación del menú principal
 #include "Menu.hpp"
-#include "Controles.hpp"
+#include "MenuControles.hpp"
 #include <SFML/Graphics.hpp>
 
 Menu::Menu(sf::RenderWindow& win) : ventana(win), seleccion(0) {
@@ -42,18 +42,19 @@ int Menu::Mostrar() {
     while (ventana.isOpen()) {
         sf::Event event;
         while (ventana.pollEvent(event)) {
-            Controles::actualizar(event);
+            MenuControles::actualizar(event);
             if (event.type == sf::Event::Closed) {
                 return 2; // Salir
             }
             if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up) {
+                // Cambiar referencias WASD a Arriba, Abajo, Izquierda, Derecha, Aceptar, Cancelar
+                if (MenuControles::Arriba()) {
                     seleccion = (seleccion + opciones.size() - 1) % opciones.size();
-                } else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down) {
+                } else if (MenuControles::Abajo()) {
                     seleccion = (seleccion + 1) % opciones.size();
-                } else if (event.key.code == sf::Keyboard::Enter) {
+                } else if (MenuControles::Aceptar()) {
                     return seleccion;
-                } else if (event.key.code == sf::Keyboard::Escape) {
+                } else if (MenuControles::Cancelar()) {
                     return 2; // Salir
                 }
             }
@@ -70,10 +71,11 @@ int Menu::Mostrar() {
         // Detectar selección con mouse
         for (size_t i = 0; i < textosMenu.size(); ++i) {
             auto bounds = textosMenu[i].getGlobalBounds();
-            sf::Vector2i mouse = Controles::mousePos(ventana);
+            sf::Vector2i mouse = MenuControles::mousePos(ventana);
             if (bounds.contains(static_cast<float>(mouse.x), static_cast<float>(mouse.y))) {
                 textosMenu[i].setFillColor(sf::Color(255, 255, 120)); // Resalta
-                if (Controles::mousePresionado(sf::Mouse::Left)) {
+                // Reemplazar mousePresionado por Aceptar para clicks principales
+                if (MenuControles::Aceptar()) {
                     return static_cast<int>(i);
                 }
             } else {

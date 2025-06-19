@@ -1,6 +1,6 @@
 // Tutorial.cpp - Implementación del primer nivel (Tutorial)
 #include "Tutorial.hpp"
-#include "Controles.hpp"
+#include "MenuControles.hpp"
 #include "Cake.hpp"
 #include "AlertaAnim.hpp"
 #include "Plataforma.hpp"
@@ -165,27 +165,38 @@ void Tutorial::Ejecutar() {
         }
         sf::Event event;
         while (ventana.pollEvent(event)) {
-            Controles::actualizar(event); // Actualizar controles universales
+            MenuControles::actualizar(event); // Actualizar controles universales
             if (event.type == sf::Event::Closed) {
                 ventana.close();
                 return;
             }
-            if (Controles::teclaPresionada(sf::Keyboard::Escape)) {
+            if (MenuControles::Cancelar()) {
                 enNivel = false; // Salir del tutorial
             }
+            // Cambiar referencias WASD a Arriba, Abajo, Izquierda, Derecha, Aceptar, Cancelar
+            if (MenuControles::Arriba()) { /* ... */ }
+            if (MenuControles::Abajo()) { /* ... */ }
+            if (MenuControles::Izquierda()) { /* ... */ }
+            if (MenuControles::Derecha()) { /* ... */ }
+            if (MenuControles::Aceptar()) { /* ... */ }
+            if (MenuControles::Cancelar()) { /* ... */ }
             // Implementación de corte de cuerda con el mouse
-            if (Controles::mousePresionado(sf::Mouse::Left) && rope && !cuerdaCortada) {
-                sf::Vector2f mousePos = ventana.mapPixelToCoords(Controles::mousePos(ventana));
+            if (MenuControles::Cancelar()) {
+                // ...código previo...
+            }
+            // Obtener la posición del mouse cada frame para evitar retrasos
+            sf::Vector2f mousePosFrame = ventana.mapPixelToCoords(MenuControles::mousePos(ventana));
+            if (MenuControles::Aceptar() && rope && !cuerdaCortada) {
                 float minDist = 16.f; // tolerancia en píxeles
                 size_t cutIdx = rope->getPoints().size();
                 const auto& pts = rope->getPoints();
                 for (size_t i = 1; i < pts.size(); ++i) {
                     sf::Vector2f a = pts[i-1];
                     sf::Vector2f b = pts[i];
-                    float t = std::max(0.f, std::min(1.f, ((mousePos - a).x * (b - a).x + (mousePos - a).y * (b - a).y) /
+                    float t = std::max(0.f, std::min(1.f, ((mousePosFrame - a).x * (b - a).x + (mousePosFrame - a).y * (b - a).y) /
                         ((b - a).x * (b - a).x + (b - a).y * (b - a).y)));
                     sf::Vector2f proj = a + t * (b - a);
-                    float dist = std::sqrt((mousePos.x - proj.x)*(mousePos.x - proj.x) + (mousePos.y - proj.y)*(mousePos.y - proj.y));
+                    float dist = std::sqrt((mousePosFrame.x - proj.x)*(mousePosFrame.x - proj.x) + (mousePosFrame.y - proj.y)*(mousePosFrame.y - proj.y));
                     if (dist < minDist) {
                         minDist = dist;
                         cutIdx = i;
@@ -194,7 +205,6 @@ void Tutorial::Ejecutar() {
                 if (cutIdx < rope->getPoints().size()) {
                     rope->cutAtSegment(cutIdx);
                     cuerdaCortada = true;
-                    animFade = 0.f;
                 }
             }
         }

@@ -1,6 +1,6 @@
 // SplashScreen.cpp - Implementación de la clase SplashScreen
 #include "SplashScreen.hpp"
-#include "Controles.hpp"
+#include "MenuControles.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -31,7 +31,7 @@ void SplashScreen::Mostrar(sf::RenderWindow& window) {
     while (window.isOpen() && !salir) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            Controles::actualizar(event);
+            MenuControles::actualizar(event);
             if (event.type == sf::Event::Closed) {
                 window.close();
                 return;

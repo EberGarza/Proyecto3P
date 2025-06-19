@@ -7,7 +7,7 @@
 #include "Tutorial.hpp"
 #include "Rope.hpp"
 #include "Cake.hpp"
-#include "Controles.hpp"
+#include "MenuControles.hpp"
 #include "AlertaAnim.hpp"
 #include "Plataforma.hpp"
 

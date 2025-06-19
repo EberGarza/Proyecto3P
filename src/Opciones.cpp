@@ -4,7 +4,7 @@
 #include <windows.h>
 #endif
 #include "Opciones.hpp"
-#include "Controles.hpp"
+#include "MenuControles.hpp"
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include <iostream>
@@ -59,7 +59,7 @@ void Opciones::Mostrar() {
     while (ventana.isOpen() && enOpciones) {
         sf::Event event;
         while (ventana.pollEvent(event)) {
-            Controles::actualizar(event);
+            MenuControles::actualizar(event);
             if (event.type == sf::Event::Closed) {
                 ventana.close();
                 return;
