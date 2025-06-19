@@ -2,7 +2,6 @@
 #define VICTORIA_HPP
 
 #include <SFML/Graphics.hpp>
-#include <vector>
 
 class Victoria {
 public:
@@ -12,19 +11,15 @@ public:
     void draw(); // Dibuja la animación
     bool isFinished() const; // Indica si la animación terminó
     void setPosition(float x, float y); // Establece la posición del sprite
-    void setScaleAndPositionFromSprite(const sf::Sprite& refSprite); // Declaración del método
-    void setReferenceSprite(const sf::Sprite* refSprite); // Nuevo: guardar referencia al sprite del personaje
+    void setScaleAndPositionFromSprite(const sf::Sprite& refSprite); // Ajustar escala y posición
+    void setReferenceSprite(const sf::Sprite* refSprite); // Guardar referencia al sprite del personaje
 private:
     sf::RenderWindow& window;
     sf::Sprite sprite;
     sf::Texture texture;
-    std::vector<sf::Texture> finalTextures;
-    int finalAnimFrame = 0;
-    float frameTime = 0.0f;
-    float frameDuration = 0.3f; // Duración de cada frame
-    float animationTime;
+    float animationDuration = 1.5f; // Duración total de la animación en segundos
+    float currentTime = 0.0f;
     bool finished;
-    bool finalAnimActive = false;
     const sf::Sprite* refSprite = nullptr; // Referencia al sprite del personaje
 };
 

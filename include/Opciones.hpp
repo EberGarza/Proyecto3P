@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include "Music.hpp"
+#include "MusicButton.hpp"
 
 class Opciones {
 public:
@@ -28,6 +30,10 @@ private:
     float animVel;
     int animDirX;
     int animDirY;
+    // Control de música
+    Music music;
+    MusicButton musicBtn;
+    bool musicPlaying;
 };
 
 #endif // OPCIONES_HPP

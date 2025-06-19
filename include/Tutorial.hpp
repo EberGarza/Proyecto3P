@@ -6,6 +6,9 @@
 #include "Cake.hpp"
 #include "AlertaAnim.hpp"
 #include "Plataforma.hpp"
+#include "Music.hpp"
+#include "MusicButton.hpp"
+#include "Estrella.hpp"  // Incluir la clase Estrella
 #include <vector>
 
 class Tutorial {
@@ -28,8 +31,16 @@ private:
     sf::Sprite tornilloSprite;
     Rope* rope = nullptr;
     Cake* cake = nullptr;
+    // Control de música
+    Music music;
+    MusicButton musicBtn;
+    bool musicPlaying;
     AlertaAnim alerta;
     Plataforma* plataforma = nullptr;
+    
+    // Estrellas del nivel
+    std::vector<Estrella*> estrellas;
+    int estrellasRecogidas = 0;
 };
 
 #endif // TUTORIAL_HPP

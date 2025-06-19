@@ -1,70 +1,33 @@
 #include "Victoria.hpp"
 
-Victoria::Victoria(sf::RenderWindow& window) : window(window), animationTime(0.0f), finished(false), finalAnimFrame(0), frameTime(0.0f), finalAnimActive(false) {
-    texture.loadFromFile("assets/images/char_1_Win.png");
+Victoria::Victoria(sf::RenderWindow& window) : window(window), currentTime(0.0f), finished(false) {
+    // Cargar una textura simple para la animación
+    texture.loadFromFile("assets/images/Final_Anim_1.png");
     sprite.setTexture(texture);
+    
     sf::Vector2u texSize = texture.getSize();
     sprite.setOrigin(texSize.x / 2.f, texSize.y / 2.f);
     sprite.setPosition(400, 300);
-    // Cargar secuencia final
-    finalTextures.resize(3);
-    finalTextures[0].loadFromFile("assets/images/Final_Anim_1.png");
-    finalTextures[1].loadFromFile("assets/images/Final_Anim_2.png");
-    finalTextures[2].loadFromFile("assets/images/Final_Anim_3.png");
 }
 
 void Victoria::start() {
-    animationTime = 0.0f;
+    currentTime = 0.0f;
     finished = false;
-    finalAnimActive = false;
-    finalAnimFrame = 0;
-    frameTime = 0.0f;
-    sprite.setTexture(texture);
+    if (refSprite) setScaleAndPositionFromSprite(*refSprite);
 }
 
 void Victoria::update(float deltaTime) {
     if (finished) return;
-    animationTime += deltaTime;
-    if (!finalAnimActive && animationTime > 2.0f) {
-        finalAnimActive = true;
-        animationTime = 0.0f;
-        finalAnimFrame = 0;
-        frameTime = 0.0f;
-        sprite.setTexture(finalTextures[0]);
-        if (refSprite) setScaleAndPositionFromSprite(*refSprite);
-    }
-    if (finalAnimActive && !finished) {
-        frameTime += deltaTime;
-        if (frameTime >= frameDuration) {
-            frameTime = 0.0f;
-            finalAnimFrame++;
-            if (finalAnimFrame < static_cast<int>(finalTextures.size())) {
-                sprite.setTexture(finalTextures[finalAnimFrame]);
-                if (refSprite) setScaleAndPositionFromSprite(*refSprite);
-            } else {
-                finished = true;
-                finalAnimActive = false;
-            }
-        }
+    
+    currentTime += deltaTime;
+    if (currentTime >= animationDuration) {
+        finished = true;
     }
 }
 
 void Victoria::draw() {
     if (!finished) {
         window.draw(sprite);
-        // Dibuja un contorno de color diferente para cada frame final
-        if (finalAnimActive) {
-            sf::FloatRect bounds = sprite.getGlobalBounds();
-            sf::RectangleShape outline(sf::Vector2f(bounds.width, bounds.height));
-            outline.setPosition(bounds.left, bounds.top);
-            outline.setFillColor(sf::Color::Transparent);
-            if (finalAnimFrame == 0) outline.setOutlineColor(sf::Color::Red);
-            else if (finalAnimFrame == 1) outline.setOutlineColor(sf::Color::Green);
-            else if (finalAnimFrame == 2) outline.setOutlineColor(sf::Color::Blue);
-            else outline.setOutlineColor(sf::Color::Yellow);
-            outline.setOutlineThickness(4.f);
-            window.draw(outline);
-        }
     }
 }
 
