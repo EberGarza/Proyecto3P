@@ -1,3 +1,4 @@
+// Cambio menor para forzar recompilación
 // Menu.cpp - Implementación del menú principal
 #include "Menu.hpp"
 #include "MenuControles.hpp"
