@@ -41,11 +41,9 @@ OpcionMenu Menu::Mostrar() {
     sf::FloatRect bounds = titulo.getLocalBounds();
     titulo.setOrigin(bounds.width / 2, bounds.height / 2);
     titulo.setPosition(ventana.getSize().x / 2, 80);
-    titulo.setRotation(-8.f);
-
-    Music music;
-    if (!music.load("assets/audio/Menu.ogg")) {
-        std::cerr << "[ERROR] No se pudo cargar el archivo de música: assets/audio/Menu.ogg\n";
+    titulo.setRotation(-8.f);    Music music;
+    if (!music.load("assets/sound/Menu.ogg")) {
+        std::cerr << "[ERROR] No se pudo cargar el archivo de música: assets/sound/Menu.ogg\n";
     }
     MusicButton musicBtn;
     bool musicPlaying = false;
