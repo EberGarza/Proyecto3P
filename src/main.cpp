@@ -3,7 +3,7 @@
 #include <iostream>
 #include "SplashScreen.hpp"
 #include "Menu.hpp"
-#include "Opciones.hpp"
+#include "MenuOpciones.hpp"
 #include "Tutorial.hpp"
 #include "Rope.hpp"
 #include "Cake.hpp"
@@ -15,7 +15,7 @@
 int main() {
     // Iniciar en pantalla completa para observar mejor la interacción de los objetos
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktop, "Cut the Rope", sf::Style::Fullscreen);
+    sf::RenderWindow window(desktop, "Cut the Capibara", sf::Style::Fullscreen);
     bool running = true;
     bool splashMostrado = false;
     while (running && window.isOpen()) {
@@ -31,9 +31,8 @@ int main() {
         } else if (opcion == 0) {
             // Iniciar tutorial
             Tutorial tutorial(window);
-            tutorial.Ejecutar();
-        } else if (opcion == 1) {
-            Opciones opciones(window);
+            tutorial.Ejecutar();        } else if (opcion == 1) {
+            MenuOpciones opciones(window);
             opciones.Mostrar();
         }
     }

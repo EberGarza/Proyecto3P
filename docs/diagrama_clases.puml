@@ -1,0 +1,222 @@
+@startuml Diagrama de Clases - Cut the Capibara
+
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype ortho
+skinparam DefaultFontName "Arial"
+
+title "Diagrama de Clases - Cut the Capibara"
+
+' Clases principales de interfaz
+class SplashScreen {
+    + void Mostrar(sf::RenderWindow& window)
+}
+
+class Menu {
+    - sf::RenderWindow& ventana
+    - std::vector<std::string> opciones
+    - std::vector<sf::Text> textosMenu
+    - sf::Font fuente
+    - int seleccion
+    + Menu(sf::RenderWindow& win)
+    + OpcionMenu Mostrar()
+}
+
+enum OpcionMenu {
+    JUGAR
+    OPCIONES
+    SALIR
+}
+
+class MenuOpciones {
+    - sf::RenderWindow& ventana
+    - std::vector<std::string> items
+    - std::vector<sf::Text> textos
+    - sf::Font fuente
+    - int seleccion
+    - std::vector<sf::Vector2u> resoluciones
+    - int resolucionActual
+    - float animX, animY, animVel
+    - int animDirX, animDirY
+    - Music music
+    - MusicButton musicBtn
+    - bool musicPlaying
+    + MenuOpciones(sf::RenderWindow& win)
+    + void Mostrar()
+}
+
+class MenuControles {
+    + static TipoDispositivo tipo
+    + static void actualizar(const sf::Event& event)
+    + static bool Arriba()
+    + static bool Abajo()
+    + static bool Izquierda()
+    + static bool Derecha()
+    + static bool Aceptar()
+    + static bool Cancelar()
+    + static sf::Vector2i mousePos(const sf::Window& ventana)
+}
+
+enum TipoDispositivo {
+    Teclado
+    Gamepad
+}
+
+' Clases del juego
+class Tutorial {
+    - sf::RenderWindow& ventana
+    - sf::Texture fondoTexture
+    - sf::Sprite fondoSprite
+    - std::vector<sf::Texture> personajeFrames
+    - sf::Sprite personajeSprite
+    - sf::Texture tornilloTexture
+    - sf::Sprite tornilloSprite
+    - Rope* rope
+    - Cake* cake
+    - Music music
+    - MusicButton musicBtn
+    - bool musicPlaying
+    - AlertaAnim alerta
+    - Plataforma* plataforma
+    + Tutorial(sf::RenderWindow& win)
+    + ~Tutorial()
+    + void Ejecutar()
+}
+
+class Rope {
+    - std::vector<sf::Vector2f> points
+    - std::vector<sf::Vector2f> prevPoints
+    - std::vector<sf::CircleShape> nodes
+    - sf::Color color
+    - int numSegments
+    - float segmentLength
+    - bool fixedStart, fixedEnd
+    - sf::Vector2f gravity
+    - int constraintIterations
+    + Rope(const sf::Vector2f& start, const sf::Vector2f& end, int segments)
+    + void update(float dt)
+    + void draw(sf::RenderWindow& window)
+    + void setFixedStart(bool fixed)
+    + void setFixedEnd(bool fixed)
+    + std::vector<sf::Vector2f>& getPoints()
+    + void cutAtSegment(size_t segmentIdx)
+}
+
+class Cake {
+    - std::vector<sf::Texture> animFrames
+    - int animFrame
+    - float animTimer, animSpeed, animInterval, animElapsed
+    - bool animando
+    - sf::Sprite sprite
+    - sf::Vector2f position
+    - float radius
+    + Cake(const sf::Vector2f& pos)
+    + void update(float dt)
+    + void draw(sf::RenderWindow& window)
+    + sf::Vector2f getPosition() const
+    + void setPosition(const sf::Vector2f& pos)
+    + float getRadius() const
+}
+
+class AlertaAnim {
+    - sf::Texture textura
+    - sf::Sprite sprite
+    - bool visible
+    - float timer, duracion
+    + AlertaAnim()
+    + void activar(const sf::Vector2f& pos, float scale)
+    + void update(float dt)
+    + void draw(sf::RenderWindow& window)
+    + bool activa() const
+    + void forzarDesactivar()
+}
+
+class Plataforma {
+    - sf::Texture textura
+    - sf::Sprite sprite
+    + Plataforma(const sf::Vector2f& pos, float scale)
+    + void draw(sf::RenderWindow& window)
+    + sf::FloatRect getBounds() const
+}
+
+class Victoria {
+    - sf::RenderWindow& window
+    - sf::Sprite sprite
+    - sf::Texture texture
+    - float animationDuration, currentTime
+    - bool finished
+    - const sf::Sprite* refSprite
+    + Victoria(sf::RenderWindow& window)
+    + void start()
+    + void update(float deltaTime)
+    + void draw()
+    + bool isFinished() const
+    + void setPosition(float x, float y)
+    + void setScaleAndPositionFromSprite(const sf::Sprite& refSprite)
+    + void setReferenceSprite(const sf::Sprite* refSprite)
+}
+
+class PantallaVictoria {
+    - sf::RenderWindow& ventana
+    - sf::Texture fondoTexture
+    - sf::Sprite fondoSprite
+    - sf::Font fuente
+    - sf::Text titulo, mensaje, instruccion
+    - float tiempoEfecto, velocidadEfecto
+    + PantallaVictoria(sf::RenderWindow& window)
+    + void mostrar()
+}
+
+' Clases de utilidad
+class Music {
+    - sf::Music music
+    - bool loaded
+    + Music()
+    + ~Music()
+    + bool load(const std::string& filename)
+    + void play()
+    + void pause()
+    + void stop()
+    + bool isPlaying() const
+}
+
+class MusicButton {
+    - sf::Texture texture
+    - sf::Sprite sprite
+    + MusicButton()
+    + void draw(sf::RenderWindow& window)
+    + bool isClicked(const sf::Vector2i& mousePos) const
+}
+
+' Relaciones
+
+' Relaciones con MenuControles (estático)
+MenuControles ..> TipoDispositivo : uses
+Menu ..> MenuControles : uses
+MenuOpciones ..> MenuControles : uses
+Tutorial ..> MenuControles : uses
+PantallaVictoria ..> MenuControles : uses
+
+' Relaciones de herencia/implementación
+Menu ..> OpcionMenu : returns
+
+' Relaciones de composición/agregación
+Tutorial *-- Rope : contains
+Tutorial *-- Cake : contains
+Tutorial *-- Plataforma : contains
+Tutorial *-- AlertaAnim : contains
+Tutorial *-- Music : contains
+Tutorial *-- MusicButton : contains
+Tutorial ..> Victoria : creates
+Tutorial ..> PantallaVictoria : shows
+MenuOpciones *-- Music : contains
+MenuOpciones *-- MusicButton : contains
+
+' Flujo principal de la aplicación
+SplashScreen <-- "1. shows" main
+Menu <-- "2. shows" main
+MenuOpciones <-- "3.1 if OpcionMenu::OPCIONES" main
+Tutorial <-- "3.2 if OpcionMenu::JUGAR" main
+
+@enduml
