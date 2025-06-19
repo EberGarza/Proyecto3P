@@ -1,7 +1,10 @@
 // Menu.cpp - Implementación del menú principal
 #include "Menu.hpp"
 #include "MenuControles.hpp"
+#include "MusicButton.hpp"
+#include "Music.hpp"
 #include <SFML/Graphics.hpp>
+#include <iostream> // Incluir iostream para std::cerr
 
 Menu::Menu(sf::RenderWindow& win) : ventana(win), seleccion(0) {
     opciones = {"Jugar", "Opciones", "Salir"};
@@ -16,7 +19,7 @@ Menu::Menu(sf::RenderWindow& win) : ventana(win), seleccion(0) {
     }
 }
 
-int Menu::Mostrar() {
+OpcionMenu Menu::Mostrar() {
     // Cargar imagen de fondo
     sf::Texture fondoTexture;
     bool fondoCargado = fondoTexture.loadFromFile("assets/images/Menu_Principal.png");
@@ -39,12 +42,20 @@ int Menu::Mostrar() {
     titulo.setOrigin(bounds.width / 2, bounds.height / 2);
     titulo.setPosition(ventana.getSize().x / 2, 80);
     titulo.setRotation(-8.f);
+
+    Music music;
+    if (!music.load("assets/audio/Menu.ogg")) {
+        std::cerr << "[ERROR] No se pudo cargar el archivo de música: assets/audio/Menu.ogg\n";
+    }
+    MusicButton musicBtn;
+    bool musicPlaying = false;
+
     while (ventana.isOpen()) {
         sf::Event event;
         while (ventana.pollEvent(event)) {
             MenuControles::actualizar(event);
             if (event.type == sf::Event::Closed) {
-                return 2; // Salir
+                return SALIR; // Salir
             }
             if (event.type == sf::Event::KeyPressed) {
                 // Cambiar referencias WASD a Arriba, Abajo, Izquierda, Derecha, Aceptar, Cancelar
@@ -53,9 +64,9 @@ int Menu::Mostrar() {
                 } else if (MenuControles::Abajo()) {
                     seleccion = (seleccion + 1) % opciones.size();
                 } else if (MenuControles::Aceptar()) {
-                    return seleccion;
+                    return static_cast<OpcionMenu>(seleccion);
                 } else if (MenuControles::Cancelar()) {
-                    return 2; // Salir
+                    return SALIR; // Salir
                 }
             }
         }
@@ -76,13 +87,30 @@ int Menu::Mostrar() {
                 textosMenu[i].setFillColor(sf::Color(255, 255, 120)); // Resalta
                 // Reemplazar mousePresionado por Aceptar para clicks principales
                 if (MenuControles::Aceptar()) {
-                    return static_cast<int>(i);
+                    return static_cast<OpcionMenu>(i);
                 }
             } else {
                 textosMenu[i].setFillColor(sf::Color(255, 255, 255));
             }
         }
+        // Dibuja el botón de música
+        musicBtn.draw(ventana);
+        // Detecta click en el botón
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            sf::Vector2i mouse = sf::Mouse::getPosition(ventana);
+            if (musicBtn.isClicked(mouse)) {
+                if (musicPlaying) {
+                    music.pause();
+                    musicPlaying = false;
+                } else {
+                    music.play();
+                    musicPlaying = true;
+                }
+                // Espera a que se suelte el botón para evitar múltiples toggles
+                while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
+            }
+        }
         ventana.display();
     }
-    return 2; // Si la ventana se cierra
+    return SALIR; // Si la ventana se cierra
 }

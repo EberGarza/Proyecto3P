@@ -14,7 +14,7 @@ EXE := $(BIN_DIR)/game.exe
 # Compilador y flags
 CXX := g++
 CXXFLAGS := -std=c++17 -I$(INCLUDE_DIR) -IC:/msys64/mingw64/include -g
-LDFLAGS := -LC:/msys64/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS := -LC:/msys64/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 # Regla principal
 all: $(EXE)
