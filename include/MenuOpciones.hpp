@@ -1,15 +1,15 @@
-// MenuOpciones.hpp - Declaración de la clase MenuOpciones (menú de opciones)
-#ifndef MENU_OPCIONES_HPP
-#define MENU_OPCIONES_HPP
+// Opciones.hpp - Declaración de la clase Opciones (menú de opciones)
+#ifndef OPCIONES_HPP
+#define OPCIONES_HPP
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
 #include "Music.hpp"
 #include "MusicButton.hpp"
 
-class MenuOpciones {
+class Opciones {
 public:
-    MenuOpciones(sf::RenderWindow& win);
+    Opciones(sf::RenderWindow& win);
     void Mostrar();
 private:
     sf::RenderWindow& ventana;
@@ -36,4 +36,4 @@ private:
     bool musicPlaying;
 };
 
-#endif // MENU_OPCIONES_HPP
+#endif // OPCIONES_HPP
