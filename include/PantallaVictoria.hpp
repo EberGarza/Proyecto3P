@@ -8,7 +8,6 @@ class PantallaVictoria {
 public:
     PantallaVictoria(sf::RenderWindow& window);
     void mostrar();
-    void setEstrellasRecogidas(int estrellas) { estrellasRecogidas = estrellas; }
     
 private:
     sf::RenderWindow& ventana;
@@ -18,12 +17,8 @@ private:
     sf::Text titulo;
     sf::Text mensaje;
     sf::Text instruccion;
-    sf::Text textoEstrellas;
     
-    int estrellasRecogidas = 0;
-    int totalEstrellas = 3;
-    
-    // Efecto para los textos
+    // Variables para efectos visuales
     float tiempoEfecto;
     float velocidadEfecto;
 };

@@ -41,29 +41,11 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win), musicPlaying(false) {
         if (frame.loadFromFile("assets/images/char_1.png")) {
             personajeFrames.push_back(frame);
         }
-    }
-    personajeSprite.setTexture(personajeFrames[0]);
+    }    personajeSprite.setTexture(personajeFrames[0]);
     // Escalar personaje relativo al alto de la ventana (más pequeño)
     float personajeScale = (winSize.y * 0.12f) / personajeFrames[0].getSize().y;
     personajeSprite.setScale(personajeScale, personajeScale);
     personajeSprite.setPosition(winSize.x / 2.f - personajeSprite.getGlobalBounds().width / 2.f, winSize.y - personajeSprite.getGlobalBounds().height - 40);
-      // Inicializar estrellas
-    // Creamos 3 estrellas que se mostrarán en la esquina superior izquierda
-    for (int i = 0; i < 3; i++) {
-        Estrella* estrella = new Estrella();
-        estrellas.push_back(estrella);
-    }
-      // Posicionar las estrellas en la esquina superior izquierda, mucho más pequeñas y juntas
-    float margenX = 40.0f;
-    float margenY = 40.0f;
-    float escalaEstrella = 0.25f; // Escala mucho más pequeña
-    float espaciadoX = 30.0f; // Espacio entre estrellas
-    
-    if (estrellas.size() >= 3) {
-        for (int i = 0; i < 3; i++) {
-            estrellas[i]->inicializar(margenX + (i * espaciadoX), margenY, escalaEstrella);
-        }
-    }
     
     // Cargar tornillo y posicionar en el centro superior
     if (!tornilloTexture.loadFromFile("assets/images/Tornillo.png")) {
@@ -117,15 +99,8 @@ Tutorial::Tutorial(sf::RenderWindow& win) : ventana(win), musicPlaying(false) {
 }
 
 Tutorial::~Tutorial() {
-    if (rope) { delete rope; rope = nullptr; }
-    if (cake) { delete cake; cake = nullptr; }
+    if (rope) { delete rope; rope = nullptr; }    if (cake) { delete cake; cake = nullptr; }
     if (plataforma) { delete plataforma; plataforma = nullptr; }
-    
-    // Liberar memoria de las estrellas
-    for (auto& estrella : estrellas) {
-        delete estrella;
-    }
-    estrellas.clear();
 }
 
 void Tutorial::Ejecutar() {
@@ -219,7 +194,7 @@ void Tutorial::Ejecutar() {
             // Obtener la posición del mouse cada frame para evitar retrasos
             sf::Vector2f mousePosFrame = ventana.mapPixelToCoords(MenuControles::mousePos(ventana));
               // Ya no necesitamos comprobar colisiones con el mouse
-            // Las estrellas se recogerán automáticamente al completar el nivel
+            // Se eliminaron referencias a estrellas
             
             if (MenuControles::Aceptar() && rope && !cuerdaCortada) {
                 float minDist = 16.f; // tolerancia en píxeles
@@ -321,16 +296,7 @@ void Tutorial::Ejecutar() {
             if (dist <= cakeRadius + pjRadius) {                if (!victoria) {
                     victoria = new Victoria(ventana);
                     victoria->setReferenceSprite(&personajeSprite);
-                    victoria->setPosition(pjCenter.x, pjCenter.y); // Ahora el sprite está centrado
-                    victoria->start();
-                    
-                    // Al completar el nivel, recoger todas las estrellas que no se hayan recogido aún
-                    for (auto& estrella : estrellas) {
-                        if (!estrella->estaRecogida()) {
-                            estrella->recoger();
-                            estrellasRecogidas++;
-                        }
-                    }
+                    victoria->setPosition(pjCenter.x, pjCenter.y); // Ahora el sprite está centrado                    victoria->start();
                 }
                 alertaMostrada = false;
                 alerta.forzarDesactivar(); // Ocultar alerta manualmente
@@ -339,28 +305,11 @@ void Tutorial::Ejecutar() {
         if (victoria) {
             victoria->update(dt);
         }
-        
-        // Actualizar estrellas
-        for (auto& estrella : estrellas) {
-            estrella->actualizar(dt);
-        }
+          // Se eliminó la actualización de estrellas
         
         ventana.clear(sf::Color(100, 180, 255));
         ventana.draw(fondoSprite);
-        ventana.draw(tornilloSprite);
-          // Dibujar fondo para las estrellas para que se vean mejor
-    sf::RectangleShape fondoEstrellas;
-    fondoEstrellas.setSize(sf::Vector2f(110.0f, 35.0f));
-    fondoEstrellas.setPosition(25.0f, 25.0f);
-    fondoEstrellas.setFillColor(sf::Color(0, 0, 0, 128)); // Semi-transparente
-    fondoEstrellas.setOutlineColor(sf::Color(255, 215, 0)); // Dorado
-    fondoEstrellas.setOutlineThickness(1.5f);
-    ventana.draw(fondoEstrellas);
-    
-    // Dibujar las estrellas
-    for (auto& estrella : estrellas) {
-        estrella->dibujar(ventana);
-    }
+        ventana.draw(tornilloSprite);    // Se eliminó el dibujo de estrellas y su fondo
         
         if (rope) {
             if (!cuerdaCortada) {
@@ -427,10 +376,8 @@ void Tutorial::Ejecutar() {
         if (victoria && victoria->isFinished()) {
             delete victoria;
             victoria = nullptr;
-            
-            // Mostrar la pantalla de victoria con el número de estrellas recogidas
+              // Mostrar la pantalla de victoria
             PantallaVictoria pantallaVictoria(ventana);
-            pantallaVictoria.setEstrellasRecogidas(estrellasRecogidas);
             pantallaVictoria.mostrar();
             
             // Al salir de la pantalla de victoria, finalizar el nivel
