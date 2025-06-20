@@ -77,7 +77,6 @@ class AlertaAnim {
   +forzarDesactivar(): void
 }
 
-' Clases relacionadas a la música y sonido
 class Music {
   -music: sf::Music
   -filePath: string
@@ -98,7 +97,6 @@ class MusicButton {
   +isClicked(mousePos: Vector2i): bool
 }
 
-' Clases relacionadas a pantallas y menús
 class Menu {
   -ventana: RenderWindow&
   -opciones: vector<string>
@@ -220,54 +218,28 @@ class Estrella {
   +estaRecogida(): bool
 }
 
-' Relaciones entre clases - Lógica de juego
-Tutorial "1" --> "1" Rope : contiene >
-Tutorial "1" --> "1" Cake : contiene >
-Tutorial "1" --> "1" AlertaAnim : contiene >
-Tutorial "1" --> "1" Plataforma : contiene >
-Tutorial "1" --> "1..*" Estrella : contiene >
-Tutorial "1" --> "1" Music : usa >
-Tutorial "1" --> "1" MusicButton : usa >
-
-' Relaciones de Victoria
-Victoria "1" --> "1" PantallaVictoria : muestra >
-
-' Relaciones con MusicButton y Music
-MenuOpciones "1" --> "1" Music : usa >
-MenuOpciones "1" --> "1" MusicButton : usa >
-MusicButton "1" ..> "1" Music : controla >
-
-' Relaciones con MenuControles
-Tutorial "1" --> "1" MenuControles : depende de >
-Victoria "1" --> "1" MenuControles : depende de >
-Menu "1" --> "1" MenuControles : depende de >
-MenuOpciones "1" --> "1" MenuControles : depende de >
-
-' Relaciones del juego principal
-Menu "1" --> "*" OpcionMenu : define >
-Menu "1" ..> "1" Tutorial : inicia si JUGAR >
-Menu "1" ..> "1" MenuOpciones : inicia si OPCIONES >
-Tutorial "1" ..> "1" Victoria : muestra al completar >
-
-' Jerarquía de pantallas y navegación del juego
-note "Flujo del juego" as N1
-SplashScreen <-- N1 : inicia
-Menu <-- SplashScreen : continúa a
-Tutorial <-- Menu : si opción JUGAR
-MenuOpciones <-- Menu : si opción OPCIONES
-Victoria <-- Tutorial : al completar nivel
-PantallaVictoria <-- Victoria : muestra
-
-' Enumeraciones
-enum OpcionMenu {
-  JUGAR = 0
-  OPCIONES
-  SALIR
-}
-
-' Relaciones de funcionalidad
-Rope "1" ..> "1" Cake : sujeta >
-Cake "1" ..> "1" Plataforma : colisiona con >
-Estrella "1" ..> "1" Cake : interactúa con >
+' Relaciones simplificadas usando solo flechas con etiquetas
+Tutorial --> Rope : tiene
+Tutorial --> Cake : tiene
+Tutorial --> AlertaAnim : tiene
+Tutorial --> Plataforma : tiene
+Tutorial --> Estrella : tiene
+Tutorial --> Music : usa
+Tutorial --> MusicButton : usa
+Victoria --> PantallaVictoria : usa
+MenuOpciones --> Music : usa
+MenuOpciones --> MusicButton : usa
+MusicButton --> Music : usa
+Tutorial --> MenuControles : depende de
+Victoria --> MenuControles : depende de
+Menu --> MenuControles : depende de
+MenuOpciones --> MenuControles : depende de
+Menu --> OpcionMenu : tiene
+Menu --> Tutorial : usa
+Menu --> MenuOpciones : usa
+Tutorial --> Victoria : usa
+Rope --> Cake : usa
+Cake --> Plataforma : usa
+Estrella --> Cake : usa
 
 @enduml
